@@ -47,3 +47,24 @@ func (r *Repository) CreateOrderTx(
 	).Scan(&order.ID)
 }
 
+func (r *Repository) CreateOrderItemTx(
+	ctx context.Context,
+	tx pgx.Tx,
+	item *OrderItem,
+) error {
+	return tx.QueryRow(
+		ctx,
+		`INSERT INTO order_items (
+			order_id,
+			product_id,
+			quantity,
+			unit_price
+		)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id`,
+		item.OrderID,
+		item.ProductID,
+		item.Quantity,
+		item.UnitPrice,
+	).Scan(&item.ID)
+}

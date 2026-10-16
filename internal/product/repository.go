@@ -21,13 +21,14 @@ func (r *Repository) GetByID(ctx context.Context, id int64) (*Product, error) {
 
 	err := r.conn.QueryRow(
 		ctx,
-		`SELECT id, name, stock
+		`SELECT id, name, price, stock
 		 FROM products
 		 WHERE id = $1`,
 		id,
 	).Scan(
 		&product.ID,
 		&product.Name,
+		&product.Price,
 		&product.Stock,
 	)
 
@@ -47,7 +48,7 @@ func (r *Repository) GetByIDForUpdate(
 
 	err := tx.QueryRow(
 		ctx,
-		`SELECT id, name, stock
+		`SELECT id, name, price, stock
 		 FROM products
 		 WHERE id = $1
 		 FOR UPDATE`,
@@ -55,6 +56,7 @@ func (r *Repository) GetByIDForUpdate(
 	).Scan(
 		&product.ID,
 		&product.Name,
+		&product.Price,
 		&product.Stock,
 	)
 
