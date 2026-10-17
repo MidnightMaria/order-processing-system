@@ -1,10 +1,10 @@
 package order
 
 type Order struct {
-	ID          int64
-	UserID      int64
-	Status      string
-	TotalAmount float64
+    ID          int64   `json:"id"`
+    UserID      int64   `json:"user_id"`
+    Status      string  `json:"status"`
+    TotalAmount float64 `json:"total_amount"`
 }
 
 type OrderItem struct {

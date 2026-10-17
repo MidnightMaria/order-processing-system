@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
+	"net/http"
 
 	"order-processing-system/internal/database"
+	"order-processing-system/internal/httpapi"
+	"order-processing-system/internal/order"
 	"order-processing-system/internal/product"
 )
 
@@ -13,19 +16,22 @@ func main() {
 
 	conn, err := database.Connect(ctx)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer conn.Close(ctx)
 
 	productRepo := product.NewRepository(conn)
-	productService := product.NewService(productRepo)
+	orderRepo := order.NewRepository(conn)
 
-	result, err := productService.GetByID(ctx, 1)
-	if err != nil {
-		panic(err)
+	orderService := order.NewService(orderRepo, productRepo, conn)
+	orderHandler := httpapi.NewOrderHandler(orderService)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/orders", orderHandler.CreateOrder)
+
+	log.Println("Server running at http://localhost:8080")
+
+	if err := http.ListenAndServe(":8080", mux); err != nil {
+		log.Fatal(err)
 	}
-
-	fmt.Println("ID:", result.ID)
-	fmt.Println("Name:", result.Name)
-	fmt.Println("Stock:", result.Stock)
 }
